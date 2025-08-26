@@ -25,6 +25,6 @@ if __name__ == "__main__":
         )
 
     uvicorn.run(
-        app=app, host=os.environ.get("DOC_HOST", os.environ["HOST"]),
+        app="main:app", reload=True, host=os.environ.get("DOC_HOST", os.environ["HOST"]),
         port=int(os.environ.get("DOC_PORT", os.environ["PORT"]))
     )

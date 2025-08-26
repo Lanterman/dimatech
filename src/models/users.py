@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Annotated
 
 from pydantic import EmailStr
 from sqlalchemy import Integer, String, ForeignKey, DateTime
@@ -8,12 +8,15 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from . import Base
 
 
+intpk = Annotated[int, mapped_column(primary_key=True, index=True)]
+
+
 class Users(Base):
     """User entities"""
 
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    id: Mapped[intpk]
     first_name: Mapped[str] = mapped_column(String(50))
     last_name: Mapped[str] = mapped_column(String(50))
     email: Mapped[EmailStr] = mapped_column(String(50), unique=True, index=True)
@@ -29,7 +32,7 @@ class Accounts(Base):
 
     __tablename__ = "accounts"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    id: Mapped[intpk]
     balance: Mapped[int] = mapped_column(Integer)
     is_activated: Mapped[bool] = mapped_column(default=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
@@ -42,7 +45,7 @@ class Payments(Base):
 
     __tablename__ = "payments"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    id: Mapped[intpk]
     amount: Mapped[int] = mapped_column(Integer)
     is_activated: Mapped[bool] = mapped_column(default=True)
     account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"))
@@ -54,7 +57,7 @@ class SecretKeys(Base):
 
     __tablename__ = "secret_keys"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    id: Mapped[intpk]
     secret_key: Mapped[str] = mapped_column(String(50), unique=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     user: Mapped["Users"] = relationship(back_populates="secret_keys")
@@ -65,7 +68,7 @@ class Tokens(Base):
 
     __tablename__ = "tokens"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    id: Mapped[intpk]
     token: Mapped[str] = mapped_column(String(300), unique=True, index=True)
     expires: Mapped[datetime] = mapped_column(DateTime, default=datetime.now() + timedelta(weeks=1))
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))

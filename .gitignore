@@ -4,8 +4,8 @@
 
 __pycache__/
 
-alembic/versions/*
-!alembic/versions/__init__.py
+src/migrations/versions/*
+!src/migrations/__init__.py
 
 test.db
 
