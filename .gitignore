@@ -1,0 +1,13 @@
+.idea
+
+.venv
+
+__pycache__/
+
+alembic/versions/*
+!alembic/versions/__init__.py
+
+test.db
+
+.pytest_cache
+.coverage
