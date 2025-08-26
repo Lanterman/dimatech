@@ -5,17 +5,18 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from models.users import Users
-from db.db import DATABASE_URL, metadata
+from models import Base
+from models.users import Users  # noqa
+from db.db import DATABASE_URL
 
 config = context.config
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-config.set_main_option("sqlalchemy.url", DATABASE_URL)
+config.set_main_option("sqlalchemy.url", DATABASE_URL + "?async_fallback=True")
 
-target_metadata = metadata
+target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:

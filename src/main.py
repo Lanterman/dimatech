@@ -2,14 +2,15 @@ import os
 import uvicorn
 
 from fastapi import FastAPI, status
-from db.db import engine, TESTING
-from config.utils import LockedError, base_ormar_config
 
-base_ormar_config.metadata.create_all(engine)
+from db.db import TESTING
+from config.utils import LockedError
 
-
+from models.users import Base
 from api.users import router as users_router
 
+
+Base.metadata.create_all
 
 app = FastAPI()
 

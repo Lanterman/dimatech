@@ -1,8 +1,6 @@
-from typing import Annotated
 from fastapi import Depends, APIRouter
 
-from repositories.users import UsersRepository
-from dependencies import get_current_user
+from .dependencies import get_current_user
 from services import users as users_service
 from schemas.users import ProfileUserSchema
 from models.users import Users

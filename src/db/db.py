@@ -1,6 +1,7 @@
 import os
-import databases
-import sqlalchemy
+
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+
 from dotenv import load_dotenv
 
 load_dotenv(dotenv_path=".env")
@@ -13,12 +14,9 @@ DATABASE_URL = os.environ.get("DOC_DATABASE_URL", os.environ["DATABASE_URL"])
 
 TESTING_DATABASE_URL = os.environ.get("DOC_TESTING_DATABASE_URL", os.environ["TESTING_DATABASE_URL"])
 
-metadata = sqlalchemy.MetaData()
-
-# connect_args={"check_same_thread": False} only use with sqlite
 if TESTING:
-    engine = sqlalchemy.create_engine(TESTING_DATABASE_URL, connect_args={"check_same_thread": False})
-    database = databases.Database(TESTING_DATABASE_URL)
+    engine = create_async_engine(TESTING_DATABASE_URL, echo=True)
 else:
-    engine = sqlalchemy.create_engine(DATABASE_URL)
-    database = databases.Database(DATABASE_URL)
+    engine = create_async_engine(DATABASE_URL, echo=True)
+
+async_session_maker = async_sessionmaker(engine, expire_on_commit=False)

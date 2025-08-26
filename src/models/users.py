@@ -1,61 +1,72 @@
-import ormar
+from datetime import datetime, timedelta
+from typing import List
 
-from datetime import datetime
 from pydantic import EmailStr
+from sqlalchemy import Integer, String, ForeignKey, DateTime
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from config.utils import base_ormar_config
+from . import Base
 
-class Users(ormar.Model):
+
+class Users(Base):
     """User entities"""
 
-    ormar_config = base_ormar_config.copy(tablename="users")
-    
-    id: int = ormar.Integer(primary_key=True, index=True)
-    first_name: str = ormar.String(max_length=50)
-    last_name: str = ormar.String(max_length=50)
-    email: EmailStr = ormar.String(max_length=50, unique=True, index=True)
-    is_activated: bool = ormar.Boolean(default=True)
-    is_admin: bool = ormar.Boolean(default=False)
-    hashed_password: str = ormar.String(max_length=100)
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    first_name: Mapped[str] = mapped_column(String(50))
+    last_name: Mapped[str] = mapped_column(String(50))
+    email: Mapped[EmailStr] = mapped_column(String(50), unique=True, index=True)
+    is_activated: Mapped[bool] = mapped_column(default=True)
+    is_admin: Mapped[bool] = mapped_column(default=False)
+    hashed_password: Mapped[str] = mapped_column(String(100))
+    accounts: Mapped[List["Accounts"]] = relationship(back_populates="user_account", cascade="all, delete-orphan")
+    token: Mapped[List["Tokens"]] = relationship(back_populates="user_token", cascade="all, delete-orphan")
 
 
-class Accounts(ormar.Model):
+class Accounts(Base):
     """Account entities"""
 
-    ormar_config = base_ormar_config.copy(tablename="accounts")
-    
-    id: int = ormar.Integer(primary_key=True, index=True)
-    balance: int = ormar.Integer()
-    is_activated: bool = ormar.Boolean(default=True)
-    user_id: int = ormar.ForeignKey(to=Users, ondelete="CASCADE", related_name="accounts")
+    __tablename__ = "accounts"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    balance: Mapped[int] = mapped_column(Integer)
+    is_activated: Mapped[bool] = mapped_column(default=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user: Mapped["Users"] = relationship(back_populates="accounts")
+    payments: Mapped[List["Payments"]] = relationship(back_populates="payment", cascade="all, delete-orphan")
 
 
-class Payments(ormar.Model):
+class Payments(Base):
     """Payment entities"""
 
-    ormar_config = base_ormar_config.copy(tablename="payments")
+    __tablename__ = "payments"
 
-    id: int = ormar.Integer(primary_key=True, index=True)
-    amount: int = ormar.Integer()
-    account_id: int = ormar.ForeignKey(to=Accounts, ondelete="CASCADE", related_name="accounts")
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    amount: Mapped[int] = mapped_column(Integer)
+    is_activated: Mapped[bool] = mapped_column(default=True)
+    account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"))
+    account: Mapped["Accounts"] = relationship(back_populates="payments")
 
 
-class SecretKeys(ormar.Model):
+class SecretKeys(Base):
     """Secret Key entities"""
 
-    ormar_config = base_ormar_config.copy(tablename="secret_keys")
+    __tablename__ = "secret_keys"
 
-    id: int = ormar.Integer(primary_key=True, index=True)
-    secret_key: str = ormar.String(max_length=300, unique=True)
-    user: int = ormar.ForeignKey(to=Users, ondelete="CASCADE", related_name="secret_key_set")
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    secret_key: Mapped[str] = mapped_column(String(50), unique=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user: Mapped["Users"] = relationship(back_populates="secret_keys")
 
 
-class Tokens(ormar.Model):
+class Tokens(Base):
     """Token entities"""
 
-    ormar_config = base_ormar_config.copy(tablename="tokens")
+    __tablename__ = "tokens"
 
-    id: int = ormar.Integer(primary_key=True, index=True)
-    token: str = ormar.String(max_length=300, index=True, unique=True)
-    expires: datetime.datetime = ormar.DateTime(default=datetime.datetime.now() + datetime.timedelta(weeks=1))
-    user: int = ormar.ForeignKey(to=Users, ondelete="CASCADE", related_name="token_set")
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    token: Mapped[str] = mapped_column(String(300), unique=True, index=True)
+    expires: Mapped[datetime] = mapped_column(DateTime, default=datetime.now() + timedelta(weeks=1))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user: Mapped["Users"] = relationship(back_populates="tokens")
