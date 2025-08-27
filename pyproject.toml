@@ -17,6 +17,7 @@ psycopg2 = "^2.9.10"
 sqlalchemy = "^2.0.43"
 pydantic = {extras = ["email"], version = "^2.11.7"}
 black = "^25.1.0"
+python-multipart = "^0.0.20"
 
 
 [build-system]

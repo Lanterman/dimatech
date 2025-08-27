@@ -6,6 +6,7 @@ from fastapi import FastAPI, status
 from db.db import TESTING
 from config.utils import LockedError
 
+from config.config import DOMAIN  # noqa
 from models.users import Base
 from api.users import router as users_router
 

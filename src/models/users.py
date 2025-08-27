@@ -23,8 +23,9 @@ class Users(Base):
     is_activated: Mapped[bool] = mapped_column(default=True)
     is_admin: Mapped[bool] = mapped_column(default=False)
     hashed_password: Mapped[str] = mapped_column(String(100))
-    accounts: Mapped[List["Accounts"]] = relationship(back_populates="user_account", cascade="all, delete-orphan")
-    token: Mapped[List["Tokens"]] = relationship(back_populates="user_token", cascade="all, delete-orphan")
+    accounts: Mapped[List["Accounts"]] = relationship("Accounts", back_populates="user")
+    token: Mapped[List["Tokens"]] = relationship("Tokens", back_populates="user")
+    secret_key: Mapped[List["SecretKeys"]] = relationship("SecretKeys", back_populates="user")
 
 
 class Accounts(Base):
@@ -35,9 +36,9 @@ class Accounts(Base):
     id: Mapped[intpk]
     balance: Mapped[int] = mapped_column(Integer)
     is_activated: Mapped[bool] = mapped_column(default=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped["Users"] = relationship(back_populates="accounts")
-    payments: Mapped[List["Payments"]] = relationship(back_populates="payment", cascade="all, delete-orphan")
+    payments: Mapped[List["Payments"]] = relationship("Payments", back_populates="account")
 
 
 class Payments(Base):
@@ -48,7 +49,7 @@ class Payments(Base):
     id: Mapped[intpk]
     amount: Mapped[int] = mapped_column(Integer)
     is_activated: Mapped[bool] = mapped_column(default=True)
-    account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"))
+    account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id", ondelete="CASCADE"))
     account: Mapped["Accounts"] = relationship(back_populates="payments")
 
 
@@ -58,9 +59,9 @@ class SecretKeys(Base):
     __tablename__ = "secret_keys"
 
     id: Mapped[intpk]
-    secret_key: Mapped[str] = mapped_column(String(50), unique=True)
+    secret_key: Mapped[str] = mapped_column(String(150), unique=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    user: Mapped["Users"] = relationship(back_populates="secret_keys")
+    user: Mapped["Users"] = relationship(back_populates="secret_key")
 
 
 class Tokens(Base):
@@ -71,5 +72,5 @@ class Tokens(Base):
     id: Mapped[intpk]
     token: Mapped[str] = mapped_column(String(300), unique=True, index=True)
     expires: Mapped[datetime] = mapped_column(DateTime, default=datetime.now() + timedelta(weeks=1))
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    user: Mapped["Users"] = relationship(back_populates="tokens")
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    user: Mapped["Users"] = relationship(back_populates="token")
