@@ -21,3 +21,23 @@ async def profile(current_user: Users = Depends(get_current_user)):
     return user_info
 
 
+@router.get("/accounts", 
+            response_model=list[users_schema.UserAccountSchema], 
+            status_code=status.HTTP_200_OK,
+            responses={401: {"description": "Invalid authentication credentials"}})
+async def accounts(current_user: Users = Depends(get_current_user)):
+    """Get user accounts - endpoint"""
+
+    accounts = await users_service.get_accounts(current_user.id)
+    return accounts
+
+
+@router.get("/payments", 
+            response_model=list[users_schema.UserPaymentSchema], 
+            status_code=status.HTTP_200_OK,
+            responses={401: {"description": "Invalid authentication credentials"}})
+async def payments(current_user: Users = Depends(get_current_user)):
+    """Get user payments - endpoint"""
+
+    payments = await users_service.get_payments(current_user.id)
+    return payments

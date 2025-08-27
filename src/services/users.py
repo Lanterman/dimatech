@@ -5,7 +5,7 @@ import hashlib
 from random import choice
 from fastapi import HTTPException, status
 
-from models.users import Users
+from models.users import Users, Accounts, Payments
 from repositories import users as users_repository
 
 
@@ -33,9 +33,8 @@ def validate_password(password: str, hashed_password: str) -> bool:
     return password_hashing(password, salt) == hashed
 
 
-# User CRUD
 async def get_user_info(user_id: int) -> Users | None:
-    """Get user or none"""
+    """Get user info"""
 
     user = await users_repository.get_user_info(user_id)
     
@@ -48,6 +47,22 @@ async def get_user_info(user_id: int) -> Users | None:
     user.full_name = f"{user.first_name} {user.last_name}"
     return user
 
+
+async def get_accounts(user_id: int) -> list[Accounts]:
+    """Get user accounts"""
+
+    accounts = await users_repository.get_accounts(user_id)
+    logging.info(f"Количество счетов пользователя '{user_id}': {len(accounts)}")
+    return accounts
+
+
+async def get_payments(user_id: int) -> list[Accounts]:
+    """Get user payments"""
+
+    payments = await users_repository.get_payments(user_id)
+    logging.info(payments[0].transaction_id)
+    logging.info(f"Количество транзакций пользователя '{user_id}': {len(payments)}")
+    return payments
 
 # async def create_user(form_data: schemas.CreateUser, back_task: BackgroundTasks) -> dict:
 #     """Create user"""

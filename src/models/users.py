@@ -1,14 +1,16 @@
+import uuid
+
 from datetime import datetime, timedelta
 from typing import List, Annotated
 
 from pydantic import EmailStr
-from sqlalchemy import Integer, String, ForeignKey, DateTime
+from sqlalchemy import Integer, String, ForeignKey, DateTime, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from . import Base
 
 
-intpk = Annotated[int, mapped_column(primary_key=True, index=True)]
+intpk = Annotated[int, mapped_column(primary_key=True, index=True, autoincrement=True)]
 
 
 class Users(Base):
@@ -48,7 +50,7 @@ class Payments(Base):
 
     id: Mapped[intpk]
     amount: Mapped[int] = mapped_column(Integer)
-    is_activated: Mapped[bool] = mapped_column(default=True)
+    transaction_id: Mapped[uuid.UUID] = mapped_column(Uuid, unique=True)
     account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id", ondelete="CASCADE"))
     account: Mapped["Accounts"] = relationship(back_populates="payments")
 

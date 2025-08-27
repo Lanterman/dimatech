@@ -1,10 +1,6 @@
-import re
-import string
-import datetime
+import uuid
 
-from typing import Optional
-from fastapi import HTTPException, status, UploadFile
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, EmailStr
 
 
 class ProfileUserSchema(BaseModel):
@@ -13,3 +9,20 @@ class ProfileUserSchema(BaseModel):
     id: int
     full_name: str
     email: EmailStr
+
+
+class UserAccountSchema(BaseModel):
+    """User account - schema"""
+
+    id: int
+    balance: int
+    is_activated: bool
+
+
+class UserPaymentSchema(BaseModel):
+    """User payment - schema"""
+
+    id: int
+    amount: int
+    transaction_id: uuid.UUID
+    account_id: int
