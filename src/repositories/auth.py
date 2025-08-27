@@ -4,7 +4,7 @@ from db.db import async_session_maker
 
 
 # Token
-async def get_user_token(token: str) -> Tokens | None:
+async def get_user_token(token: str) -> tuple[Tokens, Users] | None:
     """Get user token"""
 
     async with async_session_maker() as session:

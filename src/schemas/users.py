@@ -4,7 +4,7 @@ from pydantic import BaseModel, EmailStr
 
 
 class ProfileUserSchema(BaseModel):
-    """Base User - schema"""
+    """User profile - schema"""
 
     id: int
     full_name: str

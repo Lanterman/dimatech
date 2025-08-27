@@ -7,6 +7,7 @@ from fastapi import HTTPException, status
 
 from models.users import Users, Accounts, Payments
 from repositories import users as users_repository
+from config import utils
 
 
 # Create user password
@@ -17,7 +18,7 @@ def create_random_salt(length=12) -> str:
     return query
 
 
-def password_hashing(password: str, salt: str = None) -> hex:
+def password_hashing(password: str, salt: str = None) -> str:
     """Password hashing with salt"""
 
     if salt is None:
@@ -29,7 +30,13 @@ def password_hashing(password: str, salt: str = None) -> hex:
 def validate_password(password: str, hashed_password: str) -> bool:
     """Check if password matches hashed password from database"""
 
-    salt, hashed = hashed_password.split("$")
+    print(password, hashed_password)
+    try:
+        salt, hashed = hashed_password.split("$")
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect email or password!")
+    
+    print(password_hashing(password, salt) == hashed, password_hashing(password, salt), hashed)
     return password_hashing(password, salt) == hashed
 
 
@@ -44,7 +51,7 @@ async def get_user_info(user_id: int) -> Users | None:
             detail="No such user!",
         )
     
-    user.full_name = f"{user.first_name} {user.last_name}"
+    user.full_name = utils.get_full_name(user.first_name, user.last_name)
     return user
 
 
@@ -63,30 +70,3 @@ async def get_payments(user_id: int) -> list[Accounts]:
     logging.info(payments[0].transaction_id)
     logging.info(f"Количество транзакций пользователя '{user_id}': {len(payments)}")
     return payments
-
-# async def create_user(form_data: schemas.CreateUser, back_task: BackgroundTasks) -> dict:
-#     """Create user"""
-
-#     salt = create_random_salt()
-#     hashed_password = password_hashing(form_data.password, salt)
-#     form_data.password = f"{salt}${hashed_password}"
-#     query = await Users.objects.create(**form_data.dict())
-
-#     token = await create_user_token(user_id=query.id)
-#     token_info = {"token": token.token, "expires": token.expires}
-
-#     return {**form_data.dict(), "token": token_info}
-
-
-# async def update_user_info(form_data: schemas.UpdateUserInfo, user: Users) -> Users:
-#     """Update user information"""
-
-#     updated_user = await user.update(**form_data.dict(), update_date=datetime.datetime.now())
-#     return updated_user
-
-
-# async def delete_user(back_task: BackgroundTasks, user: Users) -> int:
-#     """Delete user"""
-
-#     query = await user.delete()
-#     return query

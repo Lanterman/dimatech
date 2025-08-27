@@ -14,7 +14,7 @@ router = APIRouter(prefix="/users", tags=["users"])
             status_code=status.HTTP_200_OK,
             responses={404: {"description": "No such user!"},
                        401: {"description": "Invalid authentication credentials"}})
-async def profile(current_user: Users = Depends(get_current_user)):
+async def get_user_profile(current_user: Users = Depends(get_current_user)):
     """Get user info - endpoint"""
 
     user_info = await users_service.get_user_info(current_user.id)
@@ -25,7 +25,7 @@ async def profile(current_user: Users = Depends(get_current_user)):
             response_model=list[users_schema.UserAccountSchema], 
             status_code=status.HTTP_200_OK,
             responses={401: {"description": "Invalid authentication credentials"}})
-async def accounts(current_user: Users = Depends(get_current_user)):
+async def get_user_accounts(current_user: Users = Depends(get_current_user)):
     """Get user accounts - endpoint"""
 
     accounts = await users_service.get_accounts(current_user.id)
@@ -36,7 +36,7 @@ async def accounts(current_user: Users = Depends(get_current_user)):
             response_model=list[users_schema.UserPaymentSchema], 
             status_code=status.HTTP_200_OK,
             responses={401: {"description": "Invalid authentication credentials"}})
-async def payments(current_user: Users = Depends(get_current_user)):
+async def get_user_payments(current_user: Users = Depends(get_current_user)):
     """Get user payments - endpoint"""
 
     payments = await users_service.get_payments(current_user.id)

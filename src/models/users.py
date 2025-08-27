@@ -10,7 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from . import Base
 
 
-intpk = Annotated[int, mapped_column(primary_key=True, index=True, autoincrement=True)]
+intpk = Annotated[int, mapped_column(primary_key=True, index=True, autoincrement=True, nullable=False)]
 
 
 class Users(Base):
@@ -19,12 +19,12 @@ class Users(Base):
     __tablename__ = "users"
 
     id: Mapped[intpk]
-    first_name: Mapped[str] = mapped_column(String(50))
-    last_name: Mapped[str] = mapped_column(String(50))
-    email: Mapped[EmailStr] = mapped_column(String(50), unique=True, index=True)
-    is_activated: Mapped[bool] = mapped_column(default=True)
-    is_admin: Mapped[bool] = mapped_column(default=False)
-    hashed_password: Mapped[str] = mapped_column(String(100))
+    first_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    last_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    email: Mapped[EmailStr] = mapped_column(String(50), unique=True, index=True, nullable=False)
+    is_activated: Mapped[bool] = mapped_column(nullable=False)
+    is_admin: Mapped[bool] = mapped_column(nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String(100), nullable=False)
     accounts: Mapped[List["Accounts"]] = relationship("Accounts", back_populates="user")
     token: Mapped[List["Tokens"]] = relationship("Tokens", back_populates="user")
     secret_key: Mapped[List["SecretKeys"]] = relationship("SecretKeys", back_populates="user")
@@ -36,8 +36,8 @@ class Accounts(Base):
     __tablename__ = "accounts"
 
     id: Mapped[intpk]
-    balance: Mapped[int] = mapped_column(Integer)
-    is_activated: Mapped[bool] = mapped_column(default=True)
+    balance: Mapped[int] = mapped_column(Integer, nullable=False)
+    is_activated: Mapped[bool] = mapped_column(nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped["Users"] = relationship(back_populates="accounts")
     payments: Mapped[List["Payments"]] = relationship("Payments", back_populates="account")
@@ -49,8 +49,8 @@ class Payments(Base):
     __tablename__ = "payments"
 
     id: Mapped[intpk]
-    amount: Mapped[int] = mapped_column(Integer)
-    transaction_id: Mapped[uuid.UUID] = mapped_column(Uuid, unique=True)
+    amount: Mapped[int] = mapped_column(Integer, nullable=False)
+    transaction_id: Mapped[uuid.UUID] = mapped_column(Uuid, unique=True, nullable=False)
     account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id", ondelete="CASCADE"))
     account: Mapped["Accounts"] = relationship(back_populates="payments")
 
@@ -61,8 +61,8 @@ class SecretKeys(Base):
     __tablename__ = "secret_keys"
 
     id: Mapped[intpk]
-    secret_key: Mapped[str] = mapped_column(String(150), unique=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    secret_key: Mapped[str] = mapped_column(String(150), unique=True, nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped["Users"] = relationship(back_populates="secret_key")
 
 
@@ -72,7 +72,7 @@ class Tokens(Base):
     __tablename__ = "tokens"
 
     id: Mapped[intpk]
-    token: Mapped[str] = mapped_column(String(300), unique=True, index=True)
-    expires: Mapped[datetime] = mapped_column(DateTime, default=datetime.now() + timedelta(weeks=1))
+    token: Mapped[str] = mapped_column(String(300), unique=True, index=True, nullable=False)
+    expires: Mapped[datetime] = mapped_column(DateTime, default=datetime.now() + timedelta(weeks=1), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped["Users"] = relationship(back_populates="token")

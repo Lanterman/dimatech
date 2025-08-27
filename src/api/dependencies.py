@@ -13,3 +13,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> users_model.U
 
     user = await auth_service.get_user_by_token(token)
     return user
+
+
+async def get_current_admin(token: str = Depends(oauth2_scheme)) -> users_model.Users:
+    """Authenticated admin with jwt"""
+
+    admin = await auth_service.get_admin_by_token(token)
+    return admin

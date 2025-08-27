@@ -24,15 +24,17 @@ async def auth(form_data: dict) -> users_model.Users | None:
     if not user.is_activated:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user!")
 
-    # if not users_service.validate_password(form_data.password, user.hashed_password):
-    #     raise error
+    if not users_service.validate_password(form_data.password, user.hashed_password):
+        raise error
 
     token = await create_user_token(user_id=user.id)
     return token
 
 
-async def get_user_by_token(token: str) -> users_model.Tokens | None:
-    """Get user token"""
+
+# Auth - dependence
+async def base_auth(token: str) -> users_model.Tokens | None:
+    """Base auth"""
 
     token_db, user_db = await auth_repository.get_user_token(token)
 
@@ -54,6 +56,24 @@ async def get_user_by_token(token: str) -> users_model.Tokens | None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user!")
     
     return user_db
+
+
+async def get_user_by_token(token: str) -> users_model.Tokens | None:
+    """Get user by token"""
+
+    user: users_model.Users = await base_auth(token)
+    return user
+
+
+async def get_admin_by_token(token: str) -> users_model.Tokens | None:
+    """Get admin by token"""
+
+    admin: users_model.Users = await base_auth(token)
+
+    if not admin.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You don't have permission!")
+    
+    return admin
 
 
 
