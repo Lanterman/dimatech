@@ -1,4 +1,4 @@
-# DISP2810 - full project
+# DIMATECH - backend
 
 ### Не мог решится с такой ситуацией:
 
@@ -91,7 +91,7 @@ poetry run python src/main.py
 #### 7) Перейдите по ссылке в браузере
 
 ```
-http://127.0.0.1:8000/dosc
+http://127.0.0.1:8000/docs
 ```
 
 P.S.
