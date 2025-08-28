@@ -70,11 +70,10 @@ class ProcessPayment:
         """Обработать вебхук"""
 
         if await self.is_signature_valid(data):
-            # Получить счет пользователя.
-            # Если его нет - создать
-            user_account = await self.get_user_account(data.user_id, data.account_id)
-
             if await self.is_payment_not_exists(data.transaction_id):
+                # Получить счет пользователя.
+                # Если его нет - создать
+                user_account = await self.get_user_account(data.user_id, data.account_id)
                 await self.create_payment(user_account.id, data.transaction_id, data.amount)
                 await self.update_amount_of_user_account(user_account, data.amount)
                 return user_account
