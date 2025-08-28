@@ -10,8 +10,8 @@ RUN pip3.12 install --upgrade pip
 
 ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 
-# RUN python3.12 -m venv .venv
-# ENV PATH="/.venv/bin:$PATH"
+RUN python3.12 -m venv .venv
+ENV PATH="/.venv/bin:$PATH"
 
 WORKDIR /app
 
