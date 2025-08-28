@@ -22,8 +22,8 @@ class Users(Base):
     first_name: Mapped[str] = mapped_column(String(50), nullable=False)
     last_name: Mapped[str] = mapped_column(String(50), nullable=False)
     email: Mapped[EmailStr] = mapped_column(String(50), unique=True, index=True, nullable=False)
-    is_activated: Mapped[bool] = mapped_column(nullable=False)
-    is_admin: Mapped[bool] = mapped_column(nullable=False)
+    is_activated: Mapped[bool] = mapped_column(nullable=False, default=True)
+    is_admin: Mapped[bool] = mapped_column(nullable=False, default=False)
     hashed_password: Mapped[str] = mapped_column(String(100), nullable=False)
     accounts: Mapped[List["Accounts"]] = relationship("Accounts", back_populates="user")
     token: Mapped[List["Tokens"]] = relationship("Tokens", back_populates="user")
@@ -36,8 +36,8 @@ class Accounts(Base):
     __tablename__ = "accounts"
 
     id: Mapped[intpk]
-    balance: Mapped[int] = mapped_column(Integer, nullable=False)
-    is_activated: Mapped[bool] = mapped_column(nullable=False)
+    balance: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    is_activated: Mapped[bool] = mapped_column(nullable=False, default=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped["Users"] = relationship(back_populates="accounts")
     payments: Mapped[List["Payments"]] = relationship("Payments", back_populates="account")

@@ -11,6 +11,7 @@ from models.users import Base
 from api.auth import router as auth_router
 from api.users import router as users_router
 from api.admin import router as admins_router
+from api.webhooks import router as webhooks_router
 
 
 Base.metadata.create_all
@@ -20,6 +21,7 @@ app = FastAPI()
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(admins_router)
+app.include_router(webhooks_router)
 
 
 if __name__ == "__main__":
