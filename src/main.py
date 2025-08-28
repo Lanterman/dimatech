@@ -2,6 +2,7 @@ import os
 import uvicorn
 
 from fastapi import FastAPI, status
+from fastapi.openapi.utils import get_openapi
 
 from db.db import TESTING
 from config.utils import LockedError
@@ -13,7 +14,6 @@ from api.users import router as users_router
 from api.admin import router as admins_router
 from api.webhooks import router as webhooks_router
 
-
 Base.metadata.create_all
 
 app = FastAPI()
@@ -22,6 +22,22 @@ app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(admins_router)
 app.include_router(webhooks_router)
+
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title="DimaTech API",
+        version="0.1.0",
+        description="This is the DimaTech OpenAPI schema!",
+        routes=app.routes,
+        contact={"GitHub": "https://github.com/Lanterman"}
+    )
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
 
 
 if __name__ == "__main__":
