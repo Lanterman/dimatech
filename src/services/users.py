@@ -67,6 +67,5 @@ async def get_payments(user_id: int) -> list[Accounts]:
     """Get user payments"""
 
     payments = await users_repository.get_payments(user_id)
-    logging.info(payments[0].transaction_id)
     logging.info(f"Количество транзакций пользователя '{user_id}': {len(payments)}")
     return payments
